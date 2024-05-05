@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--xmlns:app="http://schemas.android.come/apk/res-auto-->
+
+
+    <item android:id="@+id/main_menu"
+        android:icon="@drawable/sonia"
+        android:title="@string/main_menu" />
+    
+    <item android:id="@+id/about_menu"
+        android:icon="@drawable/sonia"
+        android:title="@string/about_menu" />
+
+    <item android:id="@+id/calculator_menu"
+        android:icon="@drawable/sonia"
+        android:title="@string/calculate_menu" />
+
+    <item android:id="@+id/after_hours_analysis_menu"
+        android:icon="@drawable/sonia"
+        android:title="After Hours Analysis" />
+
+    <item android:id="@+id/fda_approval_menu"
+        android:icon="@drawable/sonia"
+        android:title="FDA Approval Analysis" />
+
+    <item android:id="@+id/market_breakout_menu"
+        android:icon="@drawable/sonia"
+        android:title="FDA Approval Analysis" />
+
+</menu>
