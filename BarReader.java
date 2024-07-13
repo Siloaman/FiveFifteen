@@ -2,6 +2,7 @@ package com.holdings.siloaman.krenda;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -22,7 +23,8 @@ import java.util.List;
 
 public class BarReader extends AppCompatActivity {
 
-    EditText StockTicker, StartPrice, EndPrice;
+    EditText StockTicker, StartPrice, EndPrice, CashBalance;
+    TextView StartPerc, EndPerc;
     Button CalculatorButton;
 
 
@@ -46,6 +48,13 @@ public class BarReader extends AppCompatActivity {
         EndPrice = (EditText)findViewById(R.id.editText2);
         EndPrice.setGravity(Gravity.CENTER);
 
+        CashBalance = (EditText)findViewById(R.id.editText3);
+        CashBalance.setGravity(Gravity.CENTER);
+        CashBalance.getBackground().setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_ATOP);
+
+        StartPerc = (TextView)findViewById(R.id.start_perc);
+        EndPerc = (TextView)findViewById(R.id.end_perc);
+
         CalculatorButton = (Button)findViewById(R.id.calculateButton);
 
         PercentListTable = (TableLayout)findViewById(R.id.calculate_table);
@@ -55,9 +64,10 @@ public class BarReader extends AppCompatActivity {
 
         PercentumList = new ArrayList<Double>();
 
-        PercentumList.add(1.15);    PercentumList.add(1.10);    PercentumList.add(1.05);
-        PercentumList.add(1.035);    PercentumList.add(1.015);    PercentumList.add(1.00);
-        PercentumList.add(0.95);    PercentumList.add(0.90);    PercentumList.add(0.85);
+        PercentumList.add(1.05);    PercentumList.add(1.10);    PercentumList.add(1.15);
+        PercentumList.add(1.20);    PercentumList.add(1.30);    PercentumList.add(1.40);
+
+
 
 
         CalculatorButton.setOnClickListener(new View.OnClickListener() {
@@ -67,6 +77,7 @@ public class BarReader extends AppCompatActivity {
 
                 String start_price = StartPrice.getText().toString();
                 String end_price = EndPrice.getText().toString();
+                String myBalance = CashBalance.getText().toString();
                 double start_price_db = 0.0;
                 double end_price_db = 0.0;
 
@@ -103,36 +114,115 @@ public class BarReader extends AppCompatActivity {
 
         PercentListTable.removeAllViews();    // clear up the table data
 
+        DecimalFormat priceFormat = new DecimalFormat("0.00");
+
+        double s_perc = 0.00;
+        double e_perc = 0.00;
+        Double cash = 0.00;
+
+        if(end > 0.00 && start > 0.00){
+            s_perc = start * 1.07;
+            e_perc = end/start;             // 1.40 / 1.00 = 1.4            1.00 / 1.4 = 0.71
+
+            if(e_perc >= 1) {
+                e_perc -= 1;
+                e_perc *= 100;
+            } else {
+                e_perc *= 100;
+                e_perc = 100 - e_perc;
+                e_perc *= -1;
+                e_perc = (int)e_perc;
+            }
+        }
+
+
+
+        if(CashBalance.getText().length() > 0)
+            cash = Double.parseDouble(CashBalance.getText().toString());
+
+        cash -= 20.00;      // $1000 becomes $980 -> removes the commission based on two buy trades
+        cash /= 2;          // $980 becomes $490    -> divides the money for the two trades
+
+        StartPerc.setText(priceFormat.format(s_perc));
+        if(e_perc >= 1)
+            EndPerc.setText("+" + priceFormat.format(e_perc) + "%");
+        else
+            EndPerc.setText(priceFormat.format(e_perc) + "%");
+
         // Populate Screen with Ticker Symbols Gathered...
-        for (int i = -2; i < 1; i++) {       // -2 is for header, -1 is CashBalance... going from -8% to 21%
+        for (int i = -3; i < PercentumList.size(); i++) {       // -2 is for header, -1 is CashBalance... going from -8% to 21%
+
+            final TextView tv = new TextView(this);
+            tv.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
+                    TableRow.LayoutParams.WRAP_CONTENT));
+            tv.setGravity(Gravity.LEFT);
+            tv.setPadding(5, 15, 0, 15);
+            if(i < 0){
+                tv.setText("");
+            }
+            if(i >= 0){
+                tv.setBackgroundColor(Color.parseColor("#f8f8f8"));
+                tv.setText(PercentumList.get(i).toString());
+                tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+            }
 
             final TextView tv1 = new TextView(this);
             tv1.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
                     TableRow.LayoutParams.WRAP_CONTENT));
             tv1.setGravity(Gravity.LEFT);
             tv1.setPadding(5, 15, 0, 15);
-            if (i == -2) {
-                // nothing
-            } else if (i == -1){
+            if(i == -3) {
                 tv1.setBackgroundColor(Color.parseColor("#f0f0f0"));
-                tv1.setText("SIXTY FIVE");
+                tv1.setText("R-65");
                 tv1.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallTextSize);
-            } else {
+            } else if (i == -2) {
+
                 tv1.setBackgroundColor(Color.parseColor("#f8f8f8"));
 
-                double interim_price;
+                double interim_price = -404.00;
 
                 interim_price = end - start;
                 interim_price *= 0.65;
 
-                if(interim_price < 0.0)     // if its a red bar
-                    interim_price += start;
-                else
-                    interim_price += start;
+                interim_price += start;
 
                 DecimalFormat percentageFormat = new DecimalFormat("0.00");
-                tv1.setText(percentageFormat.format(interim_price));
+                tv1.setText("$" + percentageFormat.format(interim_price));
                 tv1.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+
+            } else if (i == -1){
+                double interim_price = -404.00;
+
+                interim_price = end - start;
+                interim_price *= 0.65;
+
+                interim_price += start;
+                interim_price = cash / interim_price;
+
+                tv1.setText((int)interim_price + "");
+                tv1.setBackgroundColor(Color.parseColor("#DAF7A6"));
+            }
+            else {
+
+                double interim_price = -404.00;
+                double sell_price = 0.00;
+                interim_price = end - start;
+                interim_price *= 0.65;
+
+                if (interim_price > 0.0) {
+                    interim_price += start;
+                    sell_price = interim_price * PercentumList.get(i);
+                    DecimalFormat percentageFormat = new DecimalFormat("0.00");
+
+                    tv1.setBackgroundColor(Color.parseColor("#f8f8f8"));
+                    tv1.setText(percentageFormat.format(sell_price));
+                    tv1.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+                } else {
+                    tv1.setBackgroundColor(Color.parseColor("#f8f8f8"));
+                    tv1.setText("");
+                    tv1.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+                }
+
             }   // END OF COLUMN 1
 
 
@@ -141,28 +231,57 @@ public class BarReader extends AppCompatActivity {
                     TableRow.LayoutParams.WRAP_CONTENT));
             tv2.setGravity(Gravity.LEFT);
             tv2.setPadding(5, 15, 0, 15);
-            if (i == -2) {
-                // nothing
-            } else if (i == -1){
+            if(i == -3){
                 tv2.setBackgroundColor(Color.parseColor("#f0f0f0"));
-                tv2.setText("THIRTY FIVE");
+                tv2.setText("R-35");
                 tv2.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallTextSize);
-            } else {
+            } else if (i == -2) {
+
                 tv2.setBackgroundColor(Color.parseColor("#f8f8f8"));
 
-                double interim_price;
+                double interim_price = -404.00;
 
                 interim_price = end - start;
                 interim_price *= 0.35;
 
-                if(interim_price < 0.0)     // if its a red bar
-                    interim_price += start;
-                else
-                    interim_price += start;
+                interim_price += start;
 
                 DecimalFormat percentageFormat = new DecimalFormat("0.00");
-                tv2.setText(percentageFormat.format(interim_price));
+                tv2.setText("$" + percentageFormat.format(interim_price));
                 tv2.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+            } else if (i == -1) {
+                double interim_price = -404.00;
+
+                interim_price = end - start;
+                interim_price *= 0.35;
+
+                interim_price += start;
+                interim_price = cash / interim_price;
+
+                tv2.setText((int)interim_price + "");
+                tv2.setBackgroundColor(Color.parseColor("#DAF7A6"));
+            } else {
+                tv2.setBackgroundColor(Color.parseColor("#f8f8f8"));
+
+                double interim_price = -404.00;
+                double sell_price = 0.00;
+                interim_price = end - start;
+                interim_price *= 0.35;
+
+                if (interim_price > 0.0) {
+                    interim_price += start;
+                    sell_price = interim_price * PercentumList.get(i);
+                    DecimalFormat percentageFormat = new DecimalFormat("0.00");
+
+                    tv2.setBackgroundColor(Color.parseColor("#f8f8f8"));
+                    tv2.setText(percentageFormat.format(sell_price));
+                    tv2.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+                } else {
+                    tv2.setBackgroundColor(Color.parseColor("#f8f8f8"));
+                    tv2.setText("");
+                    tv2.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+                }
+
             }   // END OF COLUMN 2
 
 
@@ -171,28 +290,39 @@ public class BarReader extends AppCompatActivity {
                     TableRow.LayoutParams.WRAP_CONTENT));
             tv3.setGravity(Gravity.LEFT);
             tv3.setPadding(5, 15, 0, 15);
-            if (i == -2) {
-                // nothing
-            } else if (i == -1){
+            if (i == -3){
                 tv3.setBackgroundColor(Color.parseColor("#f0f0f0"));
-                tv3.setText("THIRTY FIVE ABOVE");
+                tv3.setText("(+-)6.5%");
                 tv3.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallTextSize);
-            } else {
-                tv3.setBackgroundColor(Color.parseColor("#f8f8f8"));
+            } else if (i == -2) {
 
-                double interim_price;
+                double interim_price = -404.00;
 
-                interim_price = end - start;
-                interim_price *= 0.35;
-
-                if(interim_price < 0.0)     // if its a red bar
-                    interim_price += end;
+                if (end < start)     // if its a red bar
+                    interim_price = end * 0.935;    // -6.5%
                 else
-                    interim_price += end;
+                    interim_price = end * 1.065;
 
                 DecimalFormat percentageFormat = new DecimalFormat("0.00");
-                tv3.setText(percentageFormat.format(interim_price));
+                tv3.setText("$" + percentageFormat.format(interim_price));
                 tv3.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+
+
+
+            } else if (i == -1){
+
+                double interim_price = -404.00;
+                interim_price = end * 1.065;
+
+                interim_price = cash / interim_price;
+
+                tv3.setText((int)interim_price + "");
+                tv3.setBackgroundColor(Color.parseColor("#DAF7A6"));
+
+            } else {
+
+
+
             }   // END OF COLUMN 3
 
 
@@ -205,6 +335,7 @@ public class BarReader extends AppCompatActivity {
             trParams.setMargins(leftRowMargin, topRowMargin, rightRowMargin, bottomRowMargin);
             tr.setPadding(0, 0, 0, 0);
             tr.setLayoutParams(trParams);
+            tr.addView(tv);
             tr.addView(tv1);
             tr.addView(tv2);
             tr.addView(tv3);
@@ -224,7 +355,7 @@ public class BarReader extends AppCompatActivity {
                 tvSepLay.span = 4;
                 tvSep.setLayoutParams(tvSepLay);
                 tvSep.setBackgroundColor(Color.parseColor("#d9d9d9"));
-                if(i == 2 || i == 5)
+                if(i == -1 || i == 2 || i == 5)
                     tvSep.setHeight(5);
                 else
                     tvSep.setHeight(1);
