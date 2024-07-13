@@ -11,10 +11,10 @@
         android:id="@+id/editText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
         android:layout_weight="1"
         android:ems="10"
-        android:hint="Start Price"
+        android:hint="OPEN price"
         android:inputType="numberDecimal" />
     <!-- Was having issues with LinearLayout... switched to RelativeLayout
     https://stackoverflow.com/questions/7898677/edittext-wont-fill-up-the-remaining-space -->
@@ -23,10 +23,37 @@
         android:id="@+id/editText2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="15dp"
+        android:layout_toRightOf="@+id/editText"
+        android:ems="10"
+        android:hint="CLOSE price"
+        android:inputType="numberDecimal" />
+
+    <TextView
+        android:id="@+id/start_perc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignEnd="@+id/editText"
         android:layout_below="@+id/editText"
+        android:text="+7%" />
+
+    <TextView
+        android:id="@+id/end_perc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/editText2"
+        android:layout_below="@+id/editText2"
+        android:text="--" />
+
+    <EditText
+        android:id="@+id/editText3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/editText"
+        android:layout_below="@+id/start_perc"
         android:ems="10"
-        android:hint="End Price"
+        android:hint="Cash Balance"
         android:inputType="numberDecimal" />
 
 
@@ -42,7 +69,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/calculateButton"
-        android:layout_below="@+id/editText2">
+        android:layout_marginTop="30dp"
+        android:layout_below="@+id/editText3">
 
         <LinearLayout
             android:layout_width="match_parent"
