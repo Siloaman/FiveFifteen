@@ -161,8 +161,12 @@ public class BarReader extends AppCompatActivity {
                 tv.setText("");
             }
             if(i >= 0){
+                double perc = PercentumList.get(i);
+                perc -= 1;
+                perc *= 100;
+
                 tv.setBackgroundColor(Color.parseColor("#f8f8f8"));
-                tv.setText(PercentumList.get(i).toString());
+                tv.setText(Math.round(perc) + "%");
                 tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
             }
 
