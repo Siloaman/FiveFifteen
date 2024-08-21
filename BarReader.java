@@ -1,9 +1,10 @@
-package com.holdings.siloaman.krenda;
+package com.siloamanholdings.fivefifteenbarcalculator;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -21,7 +22,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BarReader extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
 
     EditText StockTicker, StartPrice, EndPrice, CashBalance;
     TextView StartPerc, EndPerc;
@@ -38,7 +39,7 @@ public class BarReader extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_bar_reader);
+        setContentView(R.layout.activity_main);
         setTitle("Bar Percentage Levels");
 
 
@@ -161,6 +162,7 @@ public class BarReader extends AppCompatActivity {
                 tv.setText("");
             }
             if(i >= 0){
+
                 double perc = PercentumList.get(i);
                 perc -= 1;
                 perc *= 100;
@@ -177,7 +179,7 @@ public class BarReader extends AppCompatActivity {
             tv1.setPadding(5, 15, 0, 15);
             if(i == -3) {
                 tv1.setBackgroundColor(Color.parseColor("#f0f0f0"));
-                tv1.setText("R-65");
+                tv1.setText("R-71");
                 tv1.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallTextSize);
             } else if (i == -2) {
 
@@ -186,7 +188,7 @@ public class BarReader extends AppCompatActivity {
                 double interim_price = -404.00;
 
                 interim_price = end - start;
-                interim_price *= 0.65;
+                interim_price *= 0.71;
 
                 interim_price += start;
 
@@ -198,7 +200,7 @@ public class BarReader extends AppCompatActivity {
                 double interim_price = -404.00;
 
                 interim_price = end - start;
-                interim_price *= 0.65;
+                interim_price *= 0.71;
 
                 interim_price += start;
                 interim_price = cash / interim_price;
@@ -211,7 +213,7 @@ public class BarReader extends AppCompatActivity {
                 double interim_price = -404.00;
                 double sell_price = 0.00;
                 interim_price = end - start;
-                interim_price *= 0.65;
+                interim_price *= 0.71;
 
                 if (interim_price > 0.0) {
                     interim_price += start;
@@ -237,7 +239,7 @@ public class BarReader extends AppCompatActivity {
             tv2.setPadding(5, 15, 0, 15);
             if(i == -3){
                 tv2.setBackgroundColor(Color.parseColor("#f0f0f0"));
-                tv2.setText("R-35");
+                tv2.setText("R-86");
                 tv2.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallTextSize);
             } else if (i == -2) {
 
@@ -246,7 +248,7 @@ public class BarReader extends AppCompatActivity {
                 double interim_price = -404.00;
 
                 interim_price = end - start;
-                interim_price *= 0.35;
+                interim_price *= 0.86;
 
                 interim_price += start;
 
@@ -257,7 +259,7 @@ public class BarReader extends AppCompatActivity {
                 double interim_price = -404.00;
 
                 interim_price = end - start;
-                interim_price *= 0.35;
+                interim_price *= 0.86;
 
                 interim_price += start;
                 interim_price = cash / interim_price;
@@ -270,7 +272,7 @@ public class BarReader extends AppCompatActivity {
                 double interim_price = -404.00;
                 double sell_price = 0.00;
                 interim_price = end - start;
-                interim_price *= 0.35;
+                interim_price *= 0.86;
 
                 if (interim_price > 0.0) {
                     interim_price += start;
@@ -296,16 +298,26 @@ public class BarReader extends AppCompatActivity {
             tv3.setPadding(5, 15, 0, 15);
             if (i == -3){
                 tv3.setBackgroundColor(Color.parseColor("#f0f0f0"));
-                tv3.setText("(+-)6.5%");
+                tv3.setText("+1/6");
                 tv3.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallTextSize);
             } else if (i == -2) {
 
                 double interim_price = -404.00;
 
-                if (end < start)     // if its a red bar
-                    interim_price = end * 0.935;    // -6.5%
-                else
-                    interim_price = end * 1.065;
+                if (end < start) {     // if its a red bar
+                    //interim_price = end * 0.935;    // -6.5%
+                    interim_price = end;
+                    double range = start - end;
+                    range = range * 0.165;
+                    interim_price -= range;
+                }
+                else {
+                    //interim_price = end * 1.065;
+                    interim_price = end;
+                    double range = end - start;
+                    range = range * 0.165;
+                    interim_price += range;
+                }
 
                 DecimalFormat percentageFormat = new DecimalFormat("0.00");
                 tv3.setText("$" + percentageFormat.format(interim_price));
@@ -368,27 +380,5 @@ public class BarReader extends AppCompatActivity {
             }
         }   // end of for loop
     }   // end of calculate()
-
-    // Create options menu
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.app_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.main_menu:
-                Intent menuIntent = new Intent(BarReader.this, MainActivity.class);
-                startActivity(menuIntent);
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    } // end of onOptionsItemSelected MENU
 
 }
